@@ -18,12 +18,6 @@ type Service struct {
 	Timestamp int64          `json:"timestamp"`
 }
 
-// type Tags struct {
-// 	tage_1 int
-// 	tage_2 int
-// 	tage_3 int
-// }
-
 var wg sync.WaitGroup
 var mux sync.Mutex
 
@@ -49,20 +43,8 @@ func ExtractEndpointsFromFile(address string) Endpoint {
 	return endpoint
 }
 
-// func readFileLineByLine(address string) []string {
-// 	var fileLines []string
-// 	content, err := os.Open(address)
-// 	check(err)
-// 	scanner := bufio.NewScanner(content)
-// 	for scanner.Scan() {
-// 		s := scanner.Text()
-// 		fileLines = append(fileLines, s)
-// 	}
-// 	return fileLines
-// }
-
 func main() {
-	endpoint := ExtractEndpointsFromFile("endpoints.json")
+	endpoint := ExtractEndpointsFromFile("./resources/endpoints.json")
 	urls := endpoint.URLs
 
 	wg.Add(len(urls))
@@ -85,10 +67,9 @@ func CollectData(URL string) {
 		for i := 0; scanner.Scan(); i++ {
 			out += scanner.Text()
 		}
-		// fmt.Println(out)
 		DecodeData(out)
 		check(scanner.Err())
-		fmt.Println("\n\n")
+		fmt.Println()
 		mux.Unlock()
 
 		time.Sleep(5 * time.Second)
@@ -97,9 +78,7 @@ func CollectData(URL string) {
 }
 
 func DecodeData(jsonString string) {
-	// fmt.Println(jsonString)
 	var services []Service
-	// ss := []Service{}
 	err := json.Unmarshal([]byte(jsonString), &services)
 	check(err)
 	fmt.Println(services)
