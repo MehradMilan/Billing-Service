@@ -18,6 +18,8 @@ type Usage struct {
 	Timestamp int64          `json:"timestamp"`
 }
 
+const sleepTime = 5
+
 var wg sync.WaitGroup
 var mux sync.Mutex
 
@@ -71,7 +73,7 @@ func SendRequest(URL string) string {
 }
 
 func ProcessRequests(URL string) {
-	ticker := time.NewTicker(5 * time.Second)
+	ticker := time.NewTicker(sleepTime * time.Second)
 	done := make(chan bool)
 	for {
 		select {
