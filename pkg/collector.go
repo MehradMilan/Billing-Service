@@ -42,6 +42,11 @@ func CollectData(address string) {
 	URLs = endpoint.URLs
 	EndPointCount = len(URLs)
 	UsagesChannel = make(chan []Usage, EndPointCount)
+	wg.Add(EndPointCount)
+	for i := 0; i < EndPointCount; i++ {
+		go ProcessRequests(URLs[i])
+	}
+	wg.Wait()
 }
 
 func SendRequest(URL string) string {
@@ -71,14 +76,14 @@ func ProcessRequests(URL string) {
 		case <-ticker.C:
 			mux.Lock()
 			response := SendRequest(URL)
-			usages := DecodeData(response)
+			usages := DecodeResponse(response)
 			UsagesChannel <- usages
 			mux.Unlock()
 		}
 	}
 }
 
-func DecodeData(jsonString string) []Usage {
+func DecodeResponse(jsonString string) []Usage {
 	var usages []Usage
 	err := json.Unmarshal([]byte(jsonString), &usages)
 	check(err)

@@ -16,11 +16,7 @@ func check(e error) {
 }
 
 func Start() {
-	CollectData(EndpointsAddress)
 	go AggregateData()
-	wg.Add(EndPointCount)
-	for i := 0; i < EndPointCount; i++ {
-		go ProcessRequests(URLs[i])
-	}
-	wg.Wait()
+	go PrintConsumers()
+	CollectData(EndpointsAddress)
 }
