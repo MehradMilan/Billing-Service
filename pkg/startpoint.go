@@ -20,3 +20,9 @@ func ReportUsages(uid int64) {
 	AggregateData()
 	PrintSelectedConsumerUsages(uid)
 }
+
+func ReportCosts(uid int64) {
+	CollectData(EndpointsAddress)
+	AggregateData()
+	PrintSelectedConsumerCosts(uid)
+}

@@ -10,10 +10,10 @@ import (
 )
 
 type Usage struct {
-	Service   string         `json:"service"`
-	Tags      map[string]int `json:"tags"`
-	Uid       int64          `json:"uid"`
-	Timestamp int64          `json:"timestamp"`
+	Service   string           `json:"service"`
+	Tags      map[string]int64 `json:"tags"`
+	Uid       int64            `json:"uid"`
+	Timestamp int64            `json:"timestamp"`
 }
 
 type Endpoint struct {

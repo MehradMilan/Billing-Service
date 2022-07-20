@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -20,6 +21,15 @@ func RunAPI() {
 		uidInt, err := strconv.Atoi(uid)
 		check(err)
 		ReportUsages(int64(uidInt))
+	})
+	http.HandleFunc("/costs", func(w http.ResponseWriter, r *http.Request) {
+		uid := r.URL.Query().Get("uid")
+		fmt.Println("id =>", uid)
+		uidInt, err := strconv.Atoi(uid)
+		check(err)
+		ReportCosts(int64(uidInt))
+		err = json.NewEncoder(w).Encode(res)
+		check(err)
 	})
 }
 
