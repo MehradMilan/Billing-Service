@@ -3,15 +3,18 @@ package pkg
 import (
 	"fmt"
 	"strconv"
-	"time"
 )
 
 func AggregateData() {
-	PersonUsage = make(map[int64][]Usage)
+	emptyUsages()
 	for {
-		fmt.Println("Aggregating...")
-		usages := <-UsagesChannel
-		AppendUsages(usages)
+		select {
+		case newUsages := <-UsagesChannel:
+			AppendUsages(newUsages)
+			fmt.Println("Aggregating...")
+		default:
+			return
+		}
 	}
 }
 
@@ -23,25 +26,25 @@ func AppendUsages(usages []Usage) {
 
 var PersonUsage map[int64][]Usage
 
-func PrintConsumers() {
-	ticker := time.NewTicker(5 * time.Second)
-	done := make(chan bool)
-	for {
-		select {
-		case <-done:
-			return
-		case <-ticker.C:
-			for i, usages := range PersonUsage {
-				var out string
-				out += "U_ID: " + strconv.FormatInt(i, 10) + "\nUsages:\n"
-				for _, usage := range usages {
-					out += usage.Service + " - "
-				}
-				fmt.Println(out, "\n")
-			}
-			emptyUsages()
-		}
+func PrintSelectedConsumerUsages(uid int64) {
+	usages := PersonUsage[uid]
+	var out string
+	out += "U_ID: " + strconv.FormatInt(uid, 10) + "\nUsages:\n"
+	for _, usage := range usages {
+		out += usage.Service + " - "
 	}
+	fmt.Println(out, "\n")
+}
+func PrintConsumers() {
+	for i, usages := range PersonUsage {
+		var out string
+		out += "U_ID: " + strconv.FormatInt(i, 10) + "\nUsages:\n"
+		for _, usage := range usages {
+			out += usage.Service + " - "
+		}
+		fmt.Println(out, "\n")
+	}
+	emptyUsages()
 }
 
 func emptyUsages() {

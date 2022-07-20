@@ -15,8 +15,8 @@ func check(e error) {
 	}
 }
 
-func Start() {
-	go AggregateData()
-	go PrintConsumers()
+func ReportUsages(uid int64) {
 	CollectData(EndpointsAddress)
+	AggregateData()
+	PrintSelectedConsumerUsages(uid)
 }

@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"time"
 )
 
 type Usage struct {
@@ -66,21 +65,19 @@ func SendRequest(URL string) string {
 }
 
 func ProcessRequests(URL string) {
-	ticker := time.NewTicker(5 * time.Second)
-	done := make(chan bool)
-	for {
-		select {
-		case <-done:
-			wg.Done()
-			return
-		case <-ticker.C:
-			mux.Lock()
-			response := SendRequest(URL)
-			usages := DecodeResponse(response)
-			UsagesChannel <- usages
-			mux.Unlock()
-		}
-	}
+	//ticker := time.NewTicker(5 * time.Second)
+	//done := make(chan bool)
+	//for {
+	//	select {
+	//	case <-done:
+	//		return
+	//	case <-ticker.C:
+	mux.Lock()
+	response := SendRequest(URL)
+	usages := DecodeResponse(response)
+	UsagesChannel <- usages
+	mux.Unlock()
+	wg.Done()
 }
 
 func DecodeResponse(jsonString string) []Usage {
