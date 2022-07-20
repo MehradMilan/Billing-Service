@@ -13,7 +13,9 @@ func Usages() {
 		fmt.Println("id =>", uid)
 		uidInt, err := strconv.Atoi(uid)
 		check(err)
-		ReportUsages(int64(uidInt))
+		response := ReportUsages(int64(uidInt))
+		err = json.NewEncoder(w).Encode(response)
+		check(err)
 	})
 }
 

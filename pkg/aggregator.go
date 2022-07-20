@@ -5,9 +5,13 @@ import (
 	"strconv"
 )
 
-type Response struct {
+type CostsResponse struct {
 	PerService map[string]int64 `json:"per_service"`
 	Total      int64            `json:"total"`
+}
+
+type UsagesResponse struct {
+	Usages []Usage `json:"usages"`
 }
 
 var PersonUsage map[int64][]Usage
@@ -32,14 +36,15 @@ func AppendUsages(usages []Usage) {
 	}
 }
 
-func PrintSelectedConsumerUsages(uid int64) {
+func CalculateConsumerUsages(uid int64) []Usage {
 	usages := PersonUsage[uid]
-	var out string
-	out += "U_ID: " + strconv.FormatInt(uid, 10) + "\nUsages:\n"
-	for _, usage := range usages {
-		out += usage.Service + " - "
-	}
-	fmt.Println(out, "\n")
+	return usages
+	//var out string
+	//out += "U_ID: " + strconv.FormatInt(uid, 10) + "\nUsages:\n"
+	//for _, usage := range usages {
+	//	out += usage.Service + " - "
+	//}
+	//fmt.Println(out, "\n")
 }
 
 func CalculateConsumerCosts(uid int64) (map[string]int64, int64) {

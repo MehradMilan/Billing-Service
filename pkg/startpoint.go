@@ -16,19 +16,22 @@ func check(e error) {
 	}
 }
 
-func ReportUsages(uid int64) {
+func ReportUsages(uid int64) UsagesResponse {
 	CollectData(EndpointsAddress)
 	AggregateData()
-	PrintSelectedConsumerUsages(uid)
+	consumerUsages := CalculateConsumerUsages(uid)
+	usagesResponse.Usages = consumerUsages
+	return usagesResponse
 }
 
-var response Response
+var costsResponse CostsResponse
+var usagesResponse UsagesResponse
 
-func ReportCosts(uid int64) Response {
+func ReportCosts(uid int64) CostsResponse {
 	CollectData(EndpointsAddress)
 	AggregateData()
 	costsPerService, total := CalculateConsumerCosts(uid)
-	response.PerService = costsPerService
-	response.Total = total
-	return response
+	costsResponse.PerService = costsPerService
+	costsResponse.Total = total
+	return costsResponse
 }
