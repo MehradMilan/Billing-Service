@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+const aggregatorInterval = 5
+
 func AggregateData() {
 	PersonUsage = make(map[int64][]Usage)
 	for {
@@ -24,7 +26,7 @@ func AppendUsages(usages []Usage) {
 var PersonUsage map[int64][]Usage
 
 func PrintConsumers() {
-	ticker := time.NewTicker(5 * time.Second)
+	ticker := time.NewTicker(aggregatorInterval * time.Second)
 	done := make(chan bool)
 	for {
 		select {
@@ -33,11 +35,9 @@ func PrintConsumers() {
 		case <-ticker.C:
 			for i, usages := range PersonUsage {
 				var out string
-				out += "U_ID: " + strconv.FormatInt(i, 10) + "\nUsages:\n"
-				for _, usage := range usages {
-					out += usage.Service + " - "
-				}
-				fmt.Println(out, "\n")
+				out += "U_ID: " + strconv.FormatInt(i, 10) + "\nUsages:"
+				fmt.Println(out)
+				fmt.Println(usages, "\n")
 			}
 			emptyUsages()
 		}
