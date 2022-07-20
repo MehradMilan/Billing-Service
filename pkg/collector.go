@@ -4,9 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
-	"os"
 )
 
 type Usage struct {
@@ -23,18 +21,6 @@ type Endpoint struct {
 var URLs []string
 var EndPointCount int
 var UsagesChannel chan []Usage
-
-func ExtractEndpointsFromFile(address string) Endpoint {
-	jsonFile, err := os.Open(address)
-	check(err)
-	defer jsonFile.Close()
-
-	byteValue, _ := ioutil.ReadAll(jsonFile)
-	var endpoint Endpoint
-	err = json.Unmarshal(byteValue, &endpoint)
-	check(err)
-	return endpoint
-}
 
 func CollectData(address string) {
 	endpoint := ExtractEndpointsFromFile(address)
@@ -65,13 +51,6 @@ func SendRequest(URL string) string {
 }
 
 func ProcessRequests(URL string) {
-	//ticker := time.NewTicker(5 * time.Second)
-	//done := make(chan bool)
-	//for {
-	//	select {
-	//	case <-done:
-	//		return
-	//	case <-ticker.C:
 	mux.Lock()
 	response := SendRequest(URL)
 	usages := DecodeResponse(response)

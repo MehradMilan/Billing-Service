@@ -5,6 +5,7 @@ import (
 )
 
 const EndpointsAddress = "./resources/endpoints.json"
+const ServicesCostsAddress = "./resources/coefficients.json"
 
 var wg sync.WaitGroup
 var mux sync.Mutex
@@ -21,8 +22,13 @@ func ReportUsages(uid int64) {
 	PrintSelectedConsumerUsages(uid)
 }
 
-func ReportCosts(uid int64) {
+var response Response
+
+func ReportCosts(uid int64) Response {
 	CollectData(EndpointsAddress)
 	AggregateData()
-	PrintSelectedConsumerCosts(uid)
+	costsPerService, total := CalculateConsumerCosts(uid)
+	response.PerService = costsPerService
+	response.Total = total
+	return response
 }

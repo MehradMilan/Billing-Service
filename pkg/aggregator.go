@@ -1,12 +1,17 @@
 package pkg
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"os"
 	"strconv"
 )
+
+type Response struct {
+	PerService map[string]int64 `json:"per_service"`
+	Total      int64            `json:"total"`
+}
+
+var PersonUsage map[int64][]Usage
+var Coefficients map[string]map[string]int64
 
 func AggregateData() {
 	emptyUsages()
@@ -27,8 +32,6 @@ func AppendUsages(usages []Usage) {
 	}
 }
 
-var PersonUsage map[int64][]Usage
-
 func PrintSelectedConsumerUsages(uid int64) {
 	usages := PersonUsage[uid]
 	var out string
@@ -39,16 +42,8 @@ func PrintSelectedConsumerUsages(uid int64) {
 	fmt.Println(out, "\n")
 }
 
-var Coefficients map[string]map[string]int64
-
-type Response struct {
-	PerService map[string]int64 `json:"per_service"`
-	Total      int64            `json:"total"`
-}
-
-func PrintSelectedConsumerCosts(uid int64) {
-	//usages := PersonUsage[uid]
-	ExtractCoefficients("./resources/coefficients.json")
+func CalculateConsumerCosts(uid int64) (map[string]int64, int64) {
+	ExtractCoefficients(ServicesCostsAddress)
 	CostsPerService := make(map[string]int64)
 	for _, usage := range PersonUsage[uid] {
 		for tagName, value := range usage.Tags {
@@ -59,22 +54,7 @@ func PrintSelectedConsumerCosts(uid int64) {
 	for _, value := range CostsPerService {
 		total += value
 	}
-	res.PerService = CostsPerService
-	res.Total = total
-	fmt.Println(res)
-}
-
-var res Response
-
-func ExtractCoefficients(address string) {
-	jsonFile, err := os.Open(address)
-	check(err)
-	defer jsonFile.Close()
-
-	byteValue, _ := ioutil.ReadAll(jsonFile)
-	err = json.Unmarshal(byteValue, &Coefficients)
-	fmt.Println(Coefficients)
-	check(err)
+	return CostsPerService, total
 }
 
 func PrintConsumers() {
