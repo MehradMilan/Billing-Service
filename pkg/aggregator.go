@@ -16,9 +16,12 @@ type UsagesResponse struct {
 
 var PersonUsage map[int64][]Usage
 var Coefficients map[string]map[string]int64
+var firstInitial = true
 
 func AggregateData() {
-	emptyUsages()
+	if firstInitial {
+		emptyUsages()
+	}
 	for {
 		select {
 		case newUsages := <-UsagesChannel:
@@ -39,12 +42,6 @@ func AppendUsages(usages []Usage) {
 func CalculateConsumerUsages(uid int64) []Usage {
 	usages := PersonUsage[uid]
 	return usages
-	//var out string
-	//out += "U_ID: " + strconv.FormatInt(uid, 10) + "\nUsages:\n"
-	//for _, usage := range usages {
-	//	out += usage.Service + " - "
-	//}
-	//fmt.Println(out, "\n")
 }
 
 func CalculateConsumerCosts(uid int64) (map[string]int64, int64) {
@@ -71,9 +68,9 @@ func PrintConsumers() {
 		}
 		fmt.Println(out, "\n")
 	}
-	emptyUsages()
 }
 
 func emptyUsages() {
+	firstInitial = false
 	PersonUsage = make(map[int64][]Usage)
 }
