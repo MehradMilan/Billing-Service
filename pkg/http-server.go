@@ -7,8 +7,10 @@ import (
 const Port = ":8000"
 
 func InitialServer() {
+	InitialServices()
 	RunAPI()
 	ListenAndServe()
+	wg.Wait()
 }
 
 func RunAPI() {

@@ -23,13 +23,8 @@ func AggregateData() {
 		emptyUsages()
 	}
 	for {
-		select {
-		case newUsages := <-UsagesChannel:
-			AppendUsages(newUsages)
-			fmt.Println("Aggregating...")
-		default:
-			return
-		}
+		newUsages := <-UsagesChannel
+		AppendUsages(newUsages)
 	}
 }
 

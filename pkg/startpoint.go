@@ -16,9 +16,13 @@ func check(e error) {
 	}
 }
 
+func InitialServices() {
+	UsagesChannel = make(chan []Usage, EndPointCount)
+	go AggregateData()
+	go CollectData(EndpointsAddress)
+}
+
 func ReportUsages(uid int64) UsagesResponse {
-	CollectData(EndpointsAddress)
-	AggregateData()
 	consumerUsages := CalculateConsumerUsages(uid)
 	usagesResponse.Usages = consumerUsages
 	return usagesResponse
@@ -28,8 +32,6 @@ var costsResponse CostsResponse
 var usagesResponse UsagesResponse
 
 func ReportCosts(uid int64) CostsResponse {
-	CollectData(EndpointsAddress)
-	AggregateData()
 	costsPerService, total := CalculateConsumerCosts(uid)
 	costsResponse.PerService = costsPerService
 	costsResponse.Total = total

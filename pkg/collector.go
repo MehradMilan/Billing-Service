@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 )
 
 type Usage struct {
@@ -18,6 +19,8 @@ type Endpoint struct {
 	URLs []string
 }
 
+const collectInterval = 5
+
 var URLs []string
 var EndPointCount int
 var UsagesChannel chan []Usage
@@ -26,7 +29,6 @@ func CollectData(address string) {
 	endpoint := ExtractEndpointsFromFile(address)
 	URLs = endpoint.URLs
 	EndPointCount = len(URLs)
-	UsagesChannel = make(chan []Usage, EndPointCount)
 	wg.Add(EndPointCount)
 	for i := 0; i < EndPointCount; i++ {
 		go ProcessRequests(URLs[i])
@@ -51,12 +53,21 @@ func SendRequest(URL string) string {
 }
 
 func ProcessRequests(URL string) {
-	mux.Lock()
-	response := SendRequest(URL)
-	usages := DecodeResponse(response)
-	UsagesChannel <- usages
-	mux.Unlock()
-	wg.Done()
+	ticker := time.NewTicker(collectInterval * time.Second)
+	done := make(chan bool)
+	for {
+		select {
+		case <-done:
+			wg.Done()
+			return
+		case <-ticker.C:
+			mux.Lock()
+			response := SendRequest(URL)
+			usages := DecodeResponse(response)
+			UsagesChannel <- usages
+			mux.Unlock()
+		}
+	}
 }
 
 func DecodeResponse(jsonString string) []Usage {
