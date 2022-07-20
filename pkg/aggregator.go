@@ -5,10 +5,10 @@ import (
 	"strconv"
 )
 
-type CostsResponse struct {
-	PerService map[string]int64 `json:"per_service"`
-	Total      int64            `json:"total"`
-}
+//type CostsResponse struct {
+//	PerService map[string]int64 `json:"per_service"`
+//	Total      int64            `json:"total"`
+//}
 
 type UsagesResponse struct {
 	Usages []Usage `json:"usages"`
@@ -40,7 +40,6 @@ func CalculateConsumerUsages(uid int64) []Usage {
 }
 
 func CalculateConsumerCosts(uid int64) (map[string]int64, int64) {
-	ExtractCoefficients(ServicesCostsAddress)
 	CostsPerService := make(map[string]int64)
 	for _, usage := range PersonUsage[uid] {
 		for tagName, value := range usage.Tags {

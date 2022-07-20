@@ -1,11 +1,9 @@
 package pkg
 
 import (
+	"Billing/pkg/metric"
 	"sync"
 )
-
-const EndpointsAddress = "./resources/endpoints.json"
-const ServicesCostsAddress = "./resources/coefficients.json"
 
 var wg sync.WaitGroup
 var mux sync.Mutex
@@ -18,6 +16,7 @@ func check(e error) {
 
 func InitialServices() {
 	UsagesChannel = make(chan []Usage, EndPointCount)
+	InitialFileExtracts()
 	go AggregateData()
 	go CollectData(EndpointsAddress)
 }
@@ -28,10 +27,10 @@ func ReportUsages(uid int64) UsagesResponse {
 	return usagesResponse
 }
 
-var costsResponse CostsResponse
+var costsResponse metric.CostsResponse
 var usagesResponse UsagesResponse
 
-func ReportCosts(uid int64) CostsResponse {
+func ReportCosts(uid int64) metric.CostsResponse {
 	costsPerService, total := CalculateConsumerCosts(uid)
 	costsResponse.PerService = costsPerService
 	costsResponse.Total = total
