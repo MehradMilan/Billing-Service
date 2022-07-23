@@ -4,46 +4,31 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
-	"os"
 	"time"
 )
 
 type Usage struct {
-	Service   string         `json:"service"`
-	Tags      map[string]int `json:"tags"`
-	Uid       int64          `json:"uid"`
-	Timestamp int64          `json:"timestamp"`
+	Service   string           `json:"service"`
+	Tags      map[string]int64 `json:"tags"`
+	Uid       int64            `json:"uid"`
+	Timestamp int64            `json:"timestamp"`
 }
-
-const sleepTime = 5
 
 type Endpoint struct {
 	URLs []string
 }
 
+const collectInterval = 5
+
 var URLs []string
 var EndPointCount int
 var UsagesChannel chan []Usage
-
-func ExtractEndpointsFromFile(address string) Endpoint {
-	jsonFile, err := os.Open(address)
-	check(err)
-	defer jsonFile.Close()
-
-	byteValue, _ := ioutil.ReadAll(jsonFile)
-	var endpoint Endpoint
-	err = json.Unmarshal(byteValue, &endpoint)
-	check(err)
-	return endpoint
-}
 
 func CollectData(address string) {
 	endpoint := ExtractEndpointsFromFile(address)
 	URLs = endpoint.URLs
 	EndPointCount = len(URLs)
-	UsagesChannel = make(chan []Usage, EndPointCount)
 	wg.Add(EndPointCount)
 	for i := 0; i < EndPointCount; i++ {
 		go ProcessRequests(URLs[i])
@@ -68,7 +53,7 @@ func SendRequest(URL string) string {
 }
 
 func ProcessRequests(URL string) {
-	ticker := time.NewTicker(sleepTime * time.Second)
+	ticker := time.NewTicker(collectInterval * time.Second)
 	done := make(chan bool)
 	for {
 		select {
