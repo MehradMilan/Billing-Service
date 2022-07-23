@@ -1,6 +1,13 @@
 package pkg
 
+import (
+	"sync"
+)
+
 const EndpointsAddress = "./resources/endpoints.json"
+
+var wg sync.WaitGroup
+var mux sync.Mutex
 
 func check(e error) {
 	if e != nil {
@@ -9,6 +16,7 @@ func check(e error) {
 }
 
 func Start() {
+	go AggregateData()
+	go PrintConsumers()
 	CollectData(EndpointsAddress)
-	<-ServicesChannel
 }

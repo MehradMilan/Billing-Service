@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"sync"
 	"time"
 )
 
@@ -20,15 +19,13 @@ type Usage struct {
 
 const sleepTime = 5
 
-var wg sync.WaitGroup
-var mux sync.Mutex
-
 type Endpoint struct {
 	URLs []string
 }
 
+var URLs []string
 var EndPointCount int
-var ServicesChannel chan []Usage
+var UsagesChannel chan []Usage
 
 func ExtractEndpointsFromFile(address string) Endpoint {
 	jsonFile, err := os.Open(address)
@@ -44,14 +41,12 @@ func ExtractEndpointsFromFile(address string) Endpoint {
 
 func CollectData(address string) {
 	endpoint := ExtractEndpointsFromFile(address)
-	urls := endpoint.URLs
-	EndPointCount = len(urls)
-
-	ServicesChannel = make(chan []Usage, EndPointCount)
-
+	URLs = endpoint.URLs
+	EndPointCount = len(URLs)
+	UsagesChannel = make(chan []Usage, EndPointCount)
 	wg.Add(EndPointCount)
 	for i := 0; i < EndPointCount; i++ {
-		go ProcessRequests(urls[i])
+		go ProcessRequests(URLs[i])
 	}
 	wg.Wait()
 }
@@ -83,17 +78,16 @@ func ProcessRequests(URL string) {
 		case <-ticker.C:
 			mux.Lock()
 			response := SendRequest(URL)
-			services := DecodeData(response)
-			ServicesChannel <- services
+			usages := DecodeResponse(response)
+			UsagesChannel <- usages
 			mux.Unlock()
 		}
 	}
 }
 
-func DecodeData(jsonString string) []Usage {
-	var services []Usage
-	err := json.Unmarshal([]byte(jsonString), &services)
+func DecodeResponse(jsonString string) []Usage {
+	var usages []Usage
+	err := json.Unmarshal([]byte(jsonString), &usages)
 	check(err)
-	fmt.Println(services)
-	return services
+	return usages
 }
