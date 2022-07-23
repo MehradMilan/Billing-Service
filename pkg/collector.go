@@ -24,9 +24,9 @@ const collectInterval = 5
 var URLs []string
 var EndPointCount int
 var UsagesChannel chan []Usage
+var endpoint Endpoint
 
 func CollectData(address string) {
-	endpoint := ExtractEndpointsFromFile(address)
 	URLs = endpoint.URLs
 	EndPointCount = len(URLs)
 	wg.Add(EndPointCount)
