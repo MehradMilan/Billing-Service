@@ -1,0 +1,6 @@
+run:
+	@echo running...
+	@go run cmd/project.go
+test:
+	@echo testing...
+	@go test
