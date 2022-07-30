@@ -4,3 +4,9 @@ run:
 test:
 	@echo testing...
 	@go test
+build-image:
+	@sudo docker build . -t billing:v1.0.0
+	@echo building...
+compose-up:
+	@sudo docker compose up
+	@echo composing up...
