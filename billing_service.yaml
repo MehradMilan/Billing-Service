@@ -4,6 +4,8 @@ metadata:
   name: billing-service
 spec:
   type: ClusterIP
+  selector:
+      app: billing
   ports:
     - name: svc-port
       protocol: TCP
